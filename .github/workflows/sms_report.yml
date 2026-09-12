@@ -1,39 +1,76 @@
 name: Daily Dollar SMS Report
 
+
+# ============================================================
+# Trigger
+# ============================================================
+
 on:
 
+  # اجرای خودکار روزانه
   schedule:
-    - cron: "00 08 * * *"
 
+    # 08:00 UTC
+    # برابر با 11:30 به وقت تهران در زمان UTC+3:30
+    - cron: "0 8 * * *"
+
+  # امکان اجرای دستی از GitHub
   workflow_dispatch:
 
 
+# ============================================================
+# Job
+# ============================================================
+
 jobs:
 
-  run-report:
+  send-sms:
+
+    name: Generate and Send Dollar Report
 
     runs-on: ubuntu-latest
 
 
     steps:
 
-      - name: Checkout
+      # ------------------------------------------------------
+      # Checkout repository
+      # ------------------------------------------------------
+
+      - name: Checkout repository
+
         uses: actions/checkout@v4
 
 
+      # ------------------------------------------------------
+      # Setup Python
+      # ------------------------------------------------------
+
       - name: Setup Python
+
         uses: actions/setup-python@v5
 
         with:
           python-version: "3.12"
 
 
-      - name: Install packages
+      # ------------------------------------------------------
+      # Install dependencies
+      # ------------------------------------------------------
+
+      - name: Install dependencies
+
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
 
-      - name: Run script
+      # ------------------------------------------------------
+      # Run Python script
+      # ------------------------------------------------------
+
+      - name: Run SMS report
+
         env:
 
           OPENAI_API_KEY:
@@ -52,4 +89,5 @@ jobs:
             ${{ secrets.SMS_TO }}
 
         run: |
+
           python main.py
