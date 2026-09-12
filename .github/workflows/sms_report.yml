@@ -1,0 +1,55 @@
+name: Daily Dollar SMS Report
+
+on:
+
+  schedule:
+    - cron: "00 08 * * *"
+
+  workflow_dispatch:
+
+
+jobs:
+
+  run-report:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+
+      - name: Install packages
+        run: |
+          pip install -r requirements.txt
+
+
+      - name: Run script
+        env:
+
+          OPENAI_API_KEY:
+            ${{ secrets.OPENAI_API_KEY }}
+
+          MELIPAYAMAK_USERNAME:
+            ${{ secrets.MELIPAYAMAK_USERNAME }}
+
+          MELIPAYAMAK_PASSWORD:
+            ${{ secrets.MELIPAYAMAK_PASSWORD }}
+
+          MELIPAYAMAK_FROM:
+            ${{ secrets.MELIPAYAMAK_FROM }}
+
+          SMS_TO:
+            ${{ secrets.SMS_TO }}
+
+        run: |
+          python main.py
